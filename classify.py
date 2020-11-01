@@ -58,10 +58,16 @@ def classifyPerceptron(train_set, train_labels, dev_set, learning_rate, max_iter
     # Train perceptron model and return predicted labels of development set
     W, b = trainPerceptron(train_set, train_labels, learning_rate, max_iter)
 
+    predictions = []
+    for data in dev_set:
+        sgn = np.sign(np.dot(W, data) + b)
+        if sgn == 1:
+            predictions.append(1)
+        else:
+            predictions.append(0)
+    return predictions
 
 
-
-    return []
 
 def classifyKNN(train_set, train_labels, dev_set, k):
     # TODO: Write your code here
