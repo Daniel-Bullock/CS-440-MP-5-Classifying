@@ -38,16 +38,18 @@ def trainPerceptron(train_set, train_labels, learning_rate, max_iter):
     # TODO: Write your code here
     # return the trained weight and bias parameters
     b = 0
-    W = [0] * 3072
+    #W = [[0 for i in range(3072)] for j in range(len(train_set))]
+    W = [0] * len(train_set[0])
+    #W = [0] * 3072
     x = 10
     for epoch in range(max_iter):     #change to max_iter
         for img in range(len(train_set)):
-            if np.dot(train_set[img], W) + b >= 0:   #sgn(WX + b) predicted 1
-                if train_labels != 1:   #if y' != y
+            if np.sign(np.dot(train_set[img], W) + b) == 1:   #sgn(WX + b) predicted 1
+                if train_labels[img] != 1:   #if y' != y
                     W -= learning_rate * train_set[img]
                     b -= learning_rate
             else:    #sgn(WX + b) predicted -1
-                if train_labels != -1:
+                if train_labels[img] != 0:
                     W += learning_rate * train_set[img]
                     b += learning_rate
 
@@ -59,8 +61,8 @@ def classifyPerceptron(train_set, train_labels, dev_set, learning_rate, max_iter
     W, b = trainPerceptron(train_set, train_labels, learning_rate, max_iter)
 
     predictions = []
-    for data in dev_set:
-        sgn = np.sign(np.dot(W, data) + b)
+    for x in dev_set:
+        sgn = np.sign(np.dot(W, x) + b)
         if sgn == 1:
             predictions.append(1)
         else:
@@ -71,4 +73,27 @@ def classifyPerceptron(train_set, train_labels, dev_set, learning_rate, max_iter
 
 def classifyKNN(train_set, train_labels, dev_set, k):
     # TODO: Write your code here
-    return []
+    predictions = []
+
+    for img in dev_set:
+        euclid_list = []
+        neighbors = {}
+
+        for i in range(len(train_set)):
+            d = np.linalg.norm(train_set[i] - img)
+            neighbors[d] = i
+            euclid_list.append(d)
+
+        euclid_list.sort()
+        euclid_list = euclid_list[:k]
+
+        sum_ = 0.0
+        for d in euclid_list:
+            sum_ += train_labels[neighbors[d]]
+
+        if sum_/k > .5:
+            predictions.append(1)
+        else:
+            predictions.append(0)
+
+    return predictions
